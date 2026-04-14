@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop Admin</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    .container {
+      width: min(1200px, 92%);
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+    h1, h2, h3 { margin: 0 0 16px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 22px; color: #f8fafc; }
+    .subtitle {
+      color: #94a3b8;
+      margin-bottom: 28px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.22);
+    }
+    .row {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+    input, textarea, button {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background: #0b1220;
+      color: #f8fafc;
+      padding: 12px 14px;
+      font-size: 15px;
+    }
+    textarea { min-height: 96px; resize: vertical; }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96,165,250,.15);
+    }
+    button {
+      cursor: pointer;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border: none;
+      font-weight: 600;
+      transition: .2s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button.secondary {
+      background: #1e293b;
+      border: 1px solid #334155;
+    }
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .message {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      display: none;
+    }
+    .message.show { display: block; }
+    .success { background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.35); color: #86efac; }
+    .error { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.35); color: #fca5a5; }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .product {
+      background: #0b1220;
+      border: 1px solid #243041;
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .product img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      background: #0f172a;
+    }
+    .product-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #172033;
+      border: 1px solid #25314a;
+      color: #bfdbfe;
+    }
+    .price {
+      font-size: 22px;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .token-box {
+      font-size: 13px;
+      color: #93c5fd;
+      word-break: break-all;
+      background: #0b1220;
+      border: 1px solid #22314a;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .product-single {
+      margin-top: 18px;
+      border-top: 1px solid #1e293b;
+      padding-top: 18px;
+    }
+    @media (max-width: 720px) {
+      .row-2 { grid-template-columns: 1fr; }
+      h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <h1>Магазин</h1>
+        <div class="subtitle">Фронтенд для твоего FastAPI бекенда</div>
+      </div>
+      <div style="min-width: 280px; max-width: 520px; width: 100%;">
+        <div id="tokenBox" class="token-box">Токен не сохранен</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Авторизация</h2>
+        <div class="row row-2">
+          <div>
+            <label for="registerUsername">Username</label>
+            <input id="registerUsername" placeholder="Например: admin" />
+          </div>
+          <div>
+            <label for="registerPassword">Password</label>
+            <input id="registerPassword" type="password" placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="registerBtn">Регистрация</button>
+        </div>
+
+        <div class="row row-2">
+          <div>
+            <label for="loginUsername">Username</label>
+            <input id="loginUsername" placeholder="Например: admin" />
+          </div>
+          <div>
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password" placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="loginBtn">Войти</button>
+          <button id="meBtn" class="secondary">Профиль /users/me</button>
+          <button id="logoutBtn" class="secondary">Выйти</button>
+        </div>
+        <div id="authMessage" class="message"></div>
+      </section>
+
+      <section class="card">
+        <h2>Поиск товара по ID</h2>
+        <div class="row row-2">
+          <div>
+            <label for="productId">ID товара</label>
+            <input id="productId" type="number" placeholder="Например: 1" />
+          </div>
+          <div style="display:flex;align-items:end;">
+            <button id="findProductBtn">Найти товар</button>
+          </div>
+        </div>
+        <div id="singleProduct" class="product-single"></div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top: 20px;">
+      <h2>Создание товара</h2>
+      <div class="row row-2">
+        <div>
+          <label for="productName">Название</label>
+          <input id="productName" placeholder="Худи Oversize" />
+        </div>
+        <div>
+          <label for="productCategory">Категория</label>
+          <input id="productCategory" placeholder="Одежда" />
+        </div>
+      </div>
+
+      <div class="row row-2">
+        <div>
+          <label for="productSize">Размер</label>
+          <input id="productSize" placeholder="M" />
+        </div>
+        <div>
+          <label for="productColor">Цвет</label>
+          <input id="productColor" placeholder="Черный" />
+        </div>
+      </div>
+
+      <div class="row row-2">
+        <div>
+          <label for="productPrice">Цена</label>
+          <input id="productPrice" type="number" placeholder="4990" />
+        </div>
+        <div>
+          <label for="imageFile">Картинка</label>
+          <input id="imageFile" type="file" accept="image/*" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="productDescription">Описание</label>
+          <textarea id="productDescription" placeholder="Короткое описание товара"></textarea>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button id="uploadImageBtn" class="secondary">Загрузить картинку</button>
+        <button id="createProductBtn">Создать товар</button>
+        <button id="loadProductsBtn" class="secondary">Обновить список</button>
+      </div>
+      <div id="productMessage" class="message"></div>
+    </section>
+
+    <section class="card" style="margin-top: 20px;">
+      <h2>Все товары</h2>
+      <div id="products" class="products"></div>
+    </section>
+  </div>
+
+  <script>
+    const API = "";
+
+    const authMessage = document.getElementById("authMessage");
+    const productMessage = document.getElementById("productMessage");
+    const tokenBox = document.getElementById("tokenBox");
+    const productsContainer = document.getElementById("products");
+    const singleProduct = document.getElementById("singleProduct");
+
+    let uploadedImageUrl = null;
+
+    function setMessage(el, text, type = "success") {
+      el.textContent = text;
+      el.className = `message show ${type}`;
+    }
+
+    function clearMessage(el) {
+      el.textContent = "";
+      el.className = "message";
+    }
+
+    function saveToken(token) {
+      localStorage.setItem("access_token", token);
+      renderToken();
+    }
+
+    function getToken() {
+      return localStorage.getItem("access_token");
+    }
+
+    function removeToken() {
+      localStorage.removeItem("access_token");
+      renderToken();
+    }
+
+    function renderToken() {
+      const token = getToken();
+      tokenBox.textContent = token ? `Bearer ${token}` : "Токен не сохранен";
+    }
+
+    async function request(url, options = {}) {
+      const res = await fetch(`${API}${url}`, options);
+      const contentType = res.headers.get("content-type") || "";
+      let data;
+
+      if (contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        data = await res.text();
+      }
+
+      if (!res.ok) {
+        const detail = data?.detail || data || `Ошибка ${res.status}`;
+        throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+      }
+
+      return data;
+    }
+
+    function productCard(product) {
+      const image = product.image_url
+        ? `<img src="${product.image_url}" alt="${product.name}" />`
+        : `<div style="height:220px;display:flex;align-items:center;justify-content:center;background:#111827;color:#64748b;">Нет изображения</div>`;
+
+      return `
+        <article class="product">
+          ${image}
+          <div class="product-body">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:start;">
+              <h3 style="margin:0;">${product.name}</h3>
+              <span class="price">${product.price} ₽</span>
+            </div>
+            <div class="meta">
+              <span class="tag">ID: ${product.id}</span>
+              <span class="tag">${product.category}</span>
+              <span class="tag">${product.size}</span>
+              <span class="tag">${product.color}</span>
+            </div>
+            <div style="color:#cbd5e1;line-height:1.5;">${product.description}</div>
+          </div>
+        </article>
+      `;
+    }
+
+    async function register() {
+      clearMessage(authMessage);
+      try {
+        const username = document.getElementById("registerUsername").value.trim();
+        const password = document.getElementById("registerPassword").value.trim();
+
+        const form = new URLSearchParams();
+        form.append("username", username);
+        form.append("password", password);
+
+        const data = await request("/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: form.toString()
+        });
+
+        setMessage(authMessage, `Пользователь создан: ${data.username}`);
+      } catch (e) {
+        setMessage(authMessage, e.message, "error");
+      }
+    }
+
+    async function login() {
+      clearMessage(authMessage);
+      try {
+        const username = document.getElementById("loginUsername").value.trim();
+        const password = document.getElementById("loginPassword").value.trim();
+
+        const form = new URLSearchParams();
+        form.append("username", username);
+        form.append("password", password);
+
+        const data = await request("/token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: form.toString()
+        });
+
+        saveToken(data.access_token);
+        setMessage(authMessage, "Успешный вход");
+      } catch (e) {
+        setMessage(authMessage, e.message, "error");
+      }
+    }
+
+    async function getMe() {
+      clearMessage(authMessage);
+      try {
+        const token = getToken();
+        if (!token) throw new Error("Сначала войди в аккаунт");
+
+        const data = await request("/users/me", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        setMessage(authMessage, `Ты вошел как: ${data.username}`);
+      } catch (e) {
+        setMessage(authMessage, e.message, "error");
+      }
+    }
+
+    async function uploadImage() {
+      clearMessage(productMessage);
+      try {
+        const fileInput = document.getElementById("imageFile");
+        const file = fileInput.files[0];
+
+        if (!file) throw new Error("Выбери изображение");
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const data = await request("/upload-image", {
+          method: "POST",
+          body: formData
+        });
+
+        uploadedImageUrl = data.image_url;
+        setMessage(productMessage, `Картинка загружена: ${uploadedImageUrl}`);
+      } catch (e) {
+        setMessage(productMessage, e.message, "error");
+      }
+    }
+
+    async function createProduct() {
+      clearMessage(productMessage);
+      try {
+        if (!uploadedImageUrl) {
+          throw new Error("Сначала загрузи картинку");
+        }
+
+        const payload = {
+          name: document.getElementById("productName").value.trim(),
+          category: document.getElementById("productCategory").value.trim(),
+          size: document.getElementById("productSize").value.trim(),
+          color: document.getElementById("productColor").value.trim(),
+          price: Number(document.getElementById("productPrice").value),
+          description: document.getElementById("productDescription").value.trim(),
+          image_url: uploadedImageUrl
+        };
+
+        if (!payload.name || !payload.category || !payload.size || !payload.color || !payload.description || !payload.price) {
+          throw new Error("Заполни все поля товара");
+        }
+
+        const data = await request("/product/append", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        setMessage(productMessage, `Товар создан: ${data.name}`);
+
+        uploadedImageUrl = null;
+        document.getElementById("imageFile").value = "";
+        document.getElementById("productName").value = "";
+        document.getElementById("productCategory").value = "";
+        document.getElementById("productSize").value = "";
+        document.getElementById("productColor").value = "";
+        document.getElementById("productPrice").value = "";
+        document.getElementById("productDescription").value = "";
+
+        await loadProducts();
+      } catch (e) {
+        setMessage(productMessage, e.message, "error");
+      }
+    }
+
+    async function loadProducts() {
+      productsContainer.innerHTML = "<div style='color:#94a3b8;'>Загрузка...</div>";
+      try {
+        const data = await request("/all/products");
+        if (!data.length) {
+          productsContainer.innerHTML = "<div style='color:#94a3b8;'>Товаров пока нет</div>";
+          return;
+        }
+        productsContainer.innerHTML = data.map(productCard).join("");
+      } catch (e) {
+        productsContainer.innerHTML = `<div style='color:#fca5a5;'>${e.message}</div>`;
+      }
+    }
+
+    async function findProduct() {
+      singleProduct.innerHTML = "";
+      try {
+        const id = document.getElementById("productId").value;
+        if (!id) throw new Error("Введи ID товара");
+        const data = await request(`/product/${id}`);
+        singleProduct.innerHTML = productCard(data);
+      } catch (e) {
+        singleProduct.innerHTML = `<div style='color:#fca5a5;'>${e.message}</div>`;
+      }
+    }
+
+    document.getElementById("registerBtn").addEventListener("click", register);
+    document.getElementById("loginBtn").addEventListener("click", login);
+    document.getElementById("meBtn").addEventListener("click", getMe);
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      removeToken();
+      setMessage(authMessage, "Выход выполнен");
+    });
+
+    document.getElementById("uploadImageBtn").addEventListener("click", uploadImage);
+    document.getElementById("createProductBtn").addEventListener("click", createProduct);
+    document.getElementById("loadProductsBtn").addEventListener("click", loadProducts);
+    document.getElementById("findProductBtn").addEventListener("click", findProduct);
+
+    renderToken();
+    loadProducts();
+  </script>
+</body>
+</html>
